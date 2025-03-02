@@ -31,7 +31,7 @@ class Main:
                 if current_time - self.last_reading_time >= self.web_server.reading_interval:
                     data = self.sensor_manager.read_sensors()
                     
-                    if data.dirt_humidity < self.web_server.need_humidity:  
+                    if data.soil_moisture < self.web_server.needed_soil_moisture:  
                         finish_ban_seconds = self.web_server.time_to_seconds(self.web_server.finish_ban_time)
                         start_ban_seconds = self.web_server.time_to_seconds(self.web_server.start_ban_time)
                         if finish_ban_seconds <  current_time % 86400 < start_ban_seconds:

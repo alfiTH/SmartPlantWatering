@@ -5,16 +5,16 @@ from time import  sleep, localtime
 
 # Data storage structure
 class Data:
-    def __init__(self,  dirt_humidity=0, air_humidity=0, air_temperature=0, water=False):
+    def __init__(self,  soil_moisture=0, air_humidity=0, air_temperature=0, water=False):
         self.timestamp = f"{DAY[localtime()[6]]}/{localtime()[3]:02d}:{localtime()[4]:02d}:{localtime()[5]:02d}"
-        self.dirt_humidity = dirt_humidity
+        self.soil_moisture = soil_moisture
         self.air_humidity = air_humidity
         self.air_temperature = air_temperature
         self.water = water
     def __repr__(self):
         return str(self)
     def __str__(self):
-        return f"timestamp: {self.timestamp}, dirt_humidity: {self.dirt_humidity}, air_humidity: {self.air_humidity}, air_temperature: {self.air_temperature}"
+        return f"timestamp: {self.timestamp}, soil_moisture: {self.soil_moisture}, air_humidity: {self.air_humidity}, air_temperature: {self.air_temperature}"
 
 # Class to manage sensors
 class SensorManager:
@@ -24,7 +24,7 @@ class SensorManager:
 
     def read_sensors(self):
         self.dht_sensor.measure()
-        return Data(self._map(self.soil_sensor.read_u16(), HUMIDITY_AIR, HUMIDITY_WATER, 0, 100),
+        return Data(self._map(self.soil_sensor.read_u16(), SOIL_SENSOR_DRY, SOIL_SENSOR_WET, 0, 100),
                     self.dht_sensor.humidity(), self.dht_sensor.temperature())
 
     def _map(self, value, in_min, in_max, out_min, out_max):

@@ -14,7 +14,7 @@ class WebServer:
     def __init__(self):
         self.__max_reading = MAX_READINGS
         self.__readings = deque([], self.max_reading)
-        self.__need_humidity = NEED_HUMIDITY
+        self.__needed_soil_moisture = NEEDED_SOIL_MOISTURE
         self.__reading_interval = READING_INTERVAL
         self.__time_water = TIME_WATER
         self.__last_water = ""
@@ -79,12 +79,12 @@ class WebServer:
         self.__last_water = value
         
     @property
-    def need_humidity(self):
-        return self.__need_humidity
-    @need_humidity.setter
-    def need_humidity(self, value):
-        if isinstance(value, (int, float)) and MIN_NEED_HUMIDITY <= value <= MAX_NEED_HUMIDITY:
-            self.__need_humidity = value
+    def needed_soil_moisture(self):
+        return self.__needed_soil_moisture
+    @needed_soil_moisture.setter
+    def needed_soil_moisture(self, value):
+        if isinstance(value, (int, float)) and MIN_NEEDED_SOIL_MOISTURE <= value <= MAX_NEEDED_SOIL_MOISTURE:
+            self.__needed_soil_moisture = value
         
     @property
     def finish_ban_time(self):
@@ -177,7 +177,7 @@ class WebServer:
 
             humidity = params.get('humidity')
             if humidity is not None and humidity.isdigit():
-                self.need_humidity = int(humidity)
+                self.needed_soil_moisture = int(humidity)
                 
             period = params.get('period')
             if period is not None and period.isdigit():
@@ -205,10 +205,10 @@ class WebServer:
         gc.collect()
         #Data
         if len(self.readings) == 0:
-            timestamps, dirt_humidity, air_humidity, air_temperature = 0,0,0,0
+            timestamps, soil_moisture, air_humidity, air_temperature = 0,0,0,0
         else:
             timestamps = f'"{self.readings[0].timestamp}"'
-            dirt_humidity = str(self.readings[0].dirt_humidity) 
+            soil_moisture = str(self.readings[0].soil_moisture) 
             air_humidity = str(self.readings[0].air_humidity) 
             air_temperature = str(self.readings[0].air_temperature)
         water_week = self.get_water_week()
@@ -342,8 +342,8 @@ Content-Type: text/html\r\n
         
          <!------------------------------------ Form ------------------------------>
         <form method='GET' action=''>
-            <label for='humidity'>Required humidity %:</label>
-            <input type='number' id='humidity' name='humidity' min='{MIN_NEED_HUMIDITY}' max='{MAX_NEED_HUMIDITY}' required value='{self.need_humidity}'>
+            <label for='humidity'>Required soli moisture %:</label>
+            <input type='number' id='humidity' name='humidity' min='{MIN_NEEDED_SOIL_MOISTURE}' max='{MAX_NEEDED_SOIL_MOISTURE}' required value='{self.needed_soil_moisture}'>
             
             <label for='period'>Sampling period in seconds:</label>
             <input type='number' id='period' name='period' min='{MIN_READING_INTERVAL}' max='{MAX_READING_INTERVAL}' required value='{self.reading_interval}'>
@@ -403,7 +403,7 @@ Content-Type: text/html\r\n
                     datasets: [
                         {{
                             label: 'Dirt Humidity (%)',
-                            data: [{dirt_humidity}],
+                            data: [{soil_moisture}],
                             borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 1
                         }},
@@ -434,7 +434,7 @@ Content-Type: text/html\r\n
             function updateChart() {{
                 $.get('/get_data', function(data) {{
                     myChart.data.labels = data.timestamps;
-                    myChart.data.datasets[0].data = data.dirt_humidity;
+                    myChart.data.datasets[0].data = data.soil_moisture;
                     myChart.data.datasets[1].data = data.air_humidity;
                     myChart.data.datasets[2].data = data.air_temperature;
                     myChart.update();
@@ -470,7 +470,7 @@ Content-Type: text/html\r\n
         print("AJAX request received")
         data = {
             "timestamps": [reading.timestamp for reading in self.readings],
-            "dirt_humidity": [reading.dirt_humidity for reading in self.readings],
+            "soil_moisture": [reading.soil_moisture for reading in self.readings],
             "air_humidity": [reading.air_humidity for reading in self.readings],
             "air_temperature": [reading.air_temperature for reading in self.readings],
             "water_week": self.get_water_week(),
@@ -503,7 +503,7 @@ if __name__ == "__main__":
             client, addr = web_server.server.accept()
             print("Client connected from:", addr)
             web_server.handle_request(client)
-            web_server.add_reading(Data(web_server.need_humidity, web_server.reading_interval, web_server.time_water))
+            web_server.add_reading(Data(web_server.needed_soil_moisture, web_server.reading_interval, web_server.time_water))
         except OSError:
             sleep(1)
         except Exception as e:

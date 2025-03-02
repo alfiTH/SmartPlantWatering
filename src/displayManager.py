@@ -19,9 +19,9 @@ class DisplayManager:
             
     def show_data(self, data:Data, last_water:str="", water_week=[0]*7):
         self.display.fill(0)
-        self.display.text(f"Dirt:{data.dirt_humidity:.2f}%", 0, 0)
-        self.display.text(f"Air :{data.air_humidity:.2f}%", 0, 10)
-        self.display.text(f"Temp:{data.air_temperature:.2f}C", 0, 20)
+        self.display.text(f"Solid:{data.soil_moisture:.2f}%", 0, 0)
+        self.display.text(f"Air  :{data.air_humidity:.2f}%", 0, 10)
+        self.display.text(f"Temp :{data.air_temperature:.2f}C", 0, 20)
         self.display.text(f"DT:{data.timestamp}", 0, 30)
         self.display.text(f"LT:{last_water}", 0, 40)
         self.display.text(f"{','.join(map(str, water_week))}", 0, 50)
